@@ -25,7 +25,7 @@
                 <tr>
                     <td>${user.id}</td>
                     <td>${user.name}</td>
-                    <td>${user.infor}</td>
+                    <td>${user.email}</td>
                     <td>${user.address}</td>
                     <td>
                         <a href="edit?id=${user.id}">Chỉnh Sửa</a> | 

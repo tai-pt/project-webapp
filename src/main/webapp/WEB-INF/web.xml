@@ -31,7 +31,7 @@
   
   <servlet>
   <servlet-name>Crud</servlet-name>
-  <servlet-class>com.java.project.controller.CrudController</servlet-class>
+  <servlet-class>com.java.project.controller.UserController</servlet-class>
   </servlet>
   <servlet-mapping>
   <servlet-name>Crud</servlet-name>

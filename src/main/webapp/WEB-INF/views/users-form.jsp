@@ -18,9 +18,10 @@
         <label for="address">Địa Chỉ:</label>
         <input type="text" id="address" name="address" value="${crud != null ? crud.address : ''}" required><br>
         <label for="photo">Ảnh:</label>
-        <input type="file" id="photo" name="photo"><br>
+        <input type="file" id="photo" name="file"><br>
         <button type="submit">Lưu</button>
         <a href="list">Hủy</a>
     </form>
+    
 </body>
 </html>

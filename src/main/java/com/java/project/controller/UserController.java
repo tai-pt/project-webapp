@@ -3,6 +3,7 @@ package com.java.project.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
@@ -30,8 +31,7 @@ public class UserController extends HttpServlet {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final String FILE_PATH = "D:\\project-webapp-master\\src\\main\\webapp\\resources\\avatar";
-	private File file;
+	private static final String FILE_PATH = "upload";
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -137,50 +137,32 @@ public class UserController extends HttpServlet {
 		String avatar = "";
 
 		
-		// handle save file to disk
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		ServletFileUpload upload = new ServletFileUpload(factory);
+		// gets absolute path of the web application
+        String appPath = req.getServletContext().getRealPath("");
+        // constructs path of the directory to save uploaded file
+        String savePath = appPath + File.separator + FILE_PATH;
+         
+        // creates the save directory if it does not exists
+        File fileSaveDir = new File(savePath);
+        if (!fileSaveDir.exists()) {
+            fileSaveDir.mkdir();
+        }
+        Part filePart = req.getPart("file");
+        String fileName = filePart.getSubmittedFileName();
+        for (Part part : req.getParts()) {
+        	part.write(savePath + File.separator+ fileName);
+        }
+        System.out.println(savePath + File.separator+ fileName);
 
-		try {
-			// Parse the request to get file items.
-			List<FileItem> fileItems = upload.parseRequest((RequestContext)req);
-
-			// Process the uploaded file items
-			Iterator i = fileItems.iterator();
-
-			while (i.hasNext()) {
-				FileItem fi = (FileItem) i.next();
-				if (!fi.isFormField()) {
-					// Get the uploaded file parameters
-					String fieldName = fi.getFieldName();
-					String fileName = fi.getName();
-					String contentType = fi.getContentType();
-					boolean isInMemory = fi.isInMemory();
-					long sizeInBytes = fi.getSize();
-
-					// Write the file
-					if (fileName.lastIndexOf("\\") >= 0) {
-						file = new File(FILE_PATH + fileName.substring(fileName.lastIndexOf("\\")));
-					} else {
-						file = new File(FILE_PATH + fileName.substring(fileName.lastIndexOf("\\") + 1));
-					}
-					fi.write(file);
-					avatar = file.getAbsolutePath() + file.getName();
-				}
-			}
-		} catch (Exception ex) {
-			System.out.println(ex);
-		}
-
-
-
-		if (userDao.addUser(new User(name, avatar,address,email))) {
+		if (userDao.addUser(new User(name, savePath + File.separator + fileName ,address,email))) {
 			req.setAttribute("message", "File uploaded and saved into database");
 		} else {
 			req.setAttribute("message", "File upload failed");
 		}
 
-		req.getRequestDispatcher("WEB-INF/views/users-list.jsp").forward(req, resp);
+		//req.getRequestDispatcher("WEB-INF/views/users-list.jsp").forward(req, resp);
+		resp.sendRedirect(req.getContextPath() + "/");
+		
 	}
 
 	private void shownewForm(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
